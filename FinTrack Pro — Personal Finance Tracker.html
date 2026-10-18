@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FinTrack — Personal Finance</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f0f4ff;--surface:#fff;--surface2:#e8eeff;--border:#d0d8f5;
+  --accent:#4f46e5;--accent2:#06b6d4;--danger:#ef4444;--warn:#f59e0b;
+  --text:#1e1b4b;--muted:#6b7280;--green:#059669;--red:#ef4444;--card-r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+h1,h2,h3{font-family:'Sora',sans-serif;}
+
+/* AUTH */
+#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 40%,#06b6d4 100%);padding:20px;}
+.auth-box{background:#fff;border-radius:28px;padding:40px 32px;width:100%;max-width:420px;box-shadow:0 25px 60px rgba(79,70,229,0.25);}
+.auth-logo{text-align:center;margin-bottom:24px;}
+.auth-logo h1{font-size:30px;color:var(--text);}
+.auth-logo span{background:linear-gradient(90deg,#4f46e5,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.auth-logo p{color:var(--muted);font-size:13px;margin-top:4px;}
+.tabs{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:20px;}
+.tab-btn{flex:1;padding:8px;border:none;background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;transition:all 0.2s;}
+.tab-btn.active{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 4px 12px rgba(79,70,229,0.3);}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;letter-spacing:0.3px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;background:#f8f9ff;border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;transition:all 0.2s;outline:none;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,0.1);}
+.form-group select option{background:#fff;color:var(--text);}
+.btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;box-shadow:0 4px 15px rgba(79,70,229,0.35);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,0.45);}
+.btn-outline{padding:8px 16px;background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-cancel{padding:13px;background:#f0f4ff;color:var(--text);border:none;border-radius:12px;font-size:15px;cursor:pointer;font-weight:500;}
+.error-msg{font-size:12px;margin-top:8px;text-align:center;}
+.error-msg.err{color:var(--danger);}
+.error-msg.ok{color:var(--green);}
+
+/* SUBSCRIPTION WALL */
+#sub-screen{min-height:100vh;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 40%,#06b6d4 100%);padding:20px;}
+.sub-box{background:#fff;border-radius:28px;padding:36px 28px;width:100%;max-width:420px;box-shadow:0 25px 60px rgba(79,70,229,0.25);text-align:center;}
+.sub-icon{font-size:52px;margin-bottom:16px;}
+.sub-box h2{font-size:24px;color:var(--text);margin-bottom:8px;}
+.sub-box p{color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.6;}
+.price-card{background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:18px;padding:24px;margin-bottom:24px;color:#fff;}
+.price-card .currency-sel{font-size:13px;margin-bottom:8px;opacity:0.85;}
+.price-card .price-big{font-size:42px;font-weight:700;font-family:'Sora',sans-serif;}
+.price-card .price-period{font-size:14px;opacity:0.8;}
+.features-list{text-align:left;margin-bottom:24px;}
+.features-list li{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;color:var(--text);border-bottom:1px solid #f0f4ff;}
+.features-list li:last-child{border:none;}
+.feat-icon{width:24px;height:24px;border-radius:50%;background:#d1fae5;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.trial-note{font-size:12px;color:var(--muted);margin-top:12px;}
+.sub-pay-btn{width:100%;padding:14px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 4px 20px rgba(79,70,229,0.4);margin-bottom:10px;}
+.skip-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;}
+
+/* APP */
+#app-screen{display:none;min-height:100vh;padding-bottom:80px;}
+.top-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(79,70,229,0.3);}
+.top-bar h2{font-size:17px;color:#fff;}
+.user-chip{display:flex;align-items:center;gap:8px;}
+.avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;border:2px solid rgba(255,255,255,0.4);}
+.top-right{display:flex;align-items:center;gap:8px;}
+.currency-badge{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;}
+.logout-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;cursor:pointer;font-size:12px;padding:4px 10px;border-radius:6px;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;border-top:1px solid var(--border);display:flex;padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(79,70,229,0.08);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border:none;background:none;color:var(--muted);transition:color 0.2s;}
+.nav-item.active{color:var(--accent);}
+.nav-icon{font-size:20px;}
+.nav-label{font-size:10px;font-weight:600;}
+
+/* PAGES */
+.page{display:none;padding:20px;}
+.page.active{display:block;}
+
+/* DASHBOARD */
+.greeting{margin-bottom:20px;}
+.greeting h2{font-size:22px;color:var(--text);}
+.greeting p{color:var(--muted);font-size:13px;margin-top:2px;}
+.sub-status-bar{background:#ede9fe;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sub-status-bar span{font-size:12px;color:#6d28d9;font-weight:600;}
+.sub-upgrade-btn{font-size:11px;padding:4px 10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
+.big-card{background:linear-gradient(135deg,#4f46e5,#7c3aed,#06b6d4);border:none;border-radius:var(--card-r);padding:24px;margin-bottom:20px;box-shadow:0 8px 30px rgba(79,70,229,0.35);}
+.big-card .label{font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:4px;font-weight:500;}
+.big-card .big-amount{font-size:34px;font-weight:700;font-family:'Sora',sans-serif;color:#fff;}
+.big-card .currency-name{font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.summary-card{background:#fff;border:none;border-radius:var(--card-r);padding:16px;box-shadow:0 2px 12px rgba(79,70,229,0.08);}
+.summary-card .label{font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.summary-card .amount{font-size:18px;font-weight:700;font-family:'Sora',sans-serif;}
+.summary-card.income{border-left:4px solid #059669;}.summary-card.income .amount{color:#059669;}
+.summary-card.expense{border-left:4px solid #ef4444;}.summary-card.expense .amount{color:#ef4444;}
+.summary-card.balance{border-left:4px solid #4f46e5;}.summary-card.balance .amount{color:#4f46e5;}
+.summary-card.debt{border-left:4px solid #f59e0b;}.summary-card.debt .amount{color:#f59e0b;}
+.section-title{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text);}
+.recent-list{background:#fff;border:none;border-radius:var(--card-r);overflow:hidden;box-shadow:0 2px 12px rgba(79,70,229,0.08);}
+.recent-item{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f0f4ff;gap:12px;}
+.recent-item:last-child{border-bottom:none;}
+.recent-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.recent-icon.income-icon{background:#d1fae5;}
+.recent-icon.expense-icon{background:#fee2e2;}
+.recent-info{flex:1;}
+.ri-title{font-size:14px;font-weight:500;}
+.ri-date{font-size:11px;color:var(--muted);margin-top:2px;}
+.recent-amount{font-weight:600;font-size:14px;}
+.income-amt{color:var(--green);}
+.expense-amt{color:var(--red);}
+
+/* TRANSACTIONS */
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;}
+.filter-btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap;font-weight:600;}
+.filter-btn.active{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(79,70,229,0.3);}
+
+/* DEBT CARDS */
+.debt-card{background:#fff;border:none;border-radius:var(--card-r);padding:18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(79,70,229,0.09);}
+.debt-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.debt-name{font-weight:700;font-size:15px;color:var(--text);}
+.debt-type-badge{font-size:10px;padding:4px 10px;border-radius:20px;background:#ede9fe;color:#6d28d9;font-weight:700;}
+.debt-detail{display:flex;justify-content:space-between;margin-top:8px;}
+.dd-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;}
+.dd-val{font-size:14px;font-weight:700;color:#f59e0b;}
+.progress-bar{height:8px;background:#e0e7ff;border-radius:4px;margin-top:12px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#4f46e5,#06b6d4);border-radius:4px;}
+.debt-actions{display:flex;gap:8px;margin-top:12px;}
+
+/* INSURANCE */
+.ins-card{background:#fff;border:none;border-radius:var(--card-r);padding:18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(79,70,229,0.09);}
+.ins-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.ins-name{font-weight:700;font-size:15px;color:var(--text);}
+.ins-type-badge{font-size:10px;padding:4px 10px;border-radius:20px;background:#d1fae5;color:#059669;font-weight:700;}
+.ins-detail{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.id-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;}
+.id-val{font-size:13px;font-weight:600;color:var(--text);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(30,27,75,0.5);backdrop-filter:blur(4px);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:28px 28px 0 0;padding:24px 20px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom));box-shadow:0 -8px 40px rgba(79,70,229,0.15);}
+.modal-handle{width:40px;height:4px;background:#e0e7ff;border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-size:20px;font-weight:700;margin-bottom:20px;font-family:'Sora',sans-serif;color:var(--text);}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+.modal-actions button{flex:1;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fab{position:fixed;bottom:88px;right:20px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;color:#fff;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(79,70,229,0.45);z-index:99;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-state .ei{font-size:40px;margin-bottom:12px;}
+.empty-state p{font-size:14px;}
+
+/* CURRENCY MODAL */
+.currency-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-height:60vh;overflow-y:auto;}
+.currency-option{padding:12px;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;}
+.currency-option:hover{border-color:var(--accent);background:#f0f4ff;}
+.currency-option.selected{border-color:var(--accent);background:#ede9fe;}
+.currency-option .c-symbol{font-size:20px;font-weight:700;color:var(--accent);}
+.currency-option .c-name{font-size:11px;color:var(--muted);margin-top:2px;}
+.currency-option .c-code{font-size:12px;font-weight:600;color:var(--text);}
+
+/* PAYMENT MODAL */
+.payment-methods{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.pay-method{padding:16px;border:1.5px solid var(--border);border-radius:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s;}
+.pay-method:hover{border-color:var(--accent);background:#f0f4ff;}
+.pay-method .pm-icon{font-size:24px;}
+.pay-method .pm-info .pm-name{font-weight:600;font-size:14px;}
+.pay-method .pm-info .pm-desc{font-size:12px;color:var(--muted);}
+.pay-confirm{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:12px;padding:14px;width:100%;font-size:15px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 4px 15px rgba(79,70,229,0.35);}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <h1>Fin<span>Track</span></h1>
+      <p>Smart finance for everyone, everywhere</p>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchAuthTab('login',this)">Login</button>
+      <button class="tab-btn" onclick="switchAuthTab('register',this)">Register</button>
+    </div>
+    <div id="login-form">
+      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="you@email.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="login()">Login</button>
+      <div class="error-msg" id="login-err"></div>
+    </div>
+    <div id="register-form" style="display:none">
+      <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your full name"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="you@email.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Min 6 characters"></div>
+      <div class="form-group">
+        <label>Your Country Currency</label>
+        <select id="reg-currency">
+          <option value="">Select currency...</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="register()">Create Free Account</button>
+      <div class="error-msg" id="reg-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBSCRIPTION SCREEN -->
+<div id="sub-screen">
+  <div class="sub-box">
+    <div class="sub-icon">💎</div>
+    <h2>Unlock FinTrack Pro</h2>
+    <p>Your free trial has ended. Subscribe to keep tracking your finances and reach your goals faster.</p>
+    <div class="price-card">
+      <div class="currency-sel">Your currency: <strong id="sub-currency-show">INR ₹</strong></div>
+      <div class="price-big" id="sub-price-show">₹50</div>
+      <div class="price-period">per month • cancel anytime</div>
+    </div>
+    <ul class="features-list">
+      <li><div class="feat-icon">✓</div>Unlimited transactions</li>
+      <li><div class="feat-icon">✓</div>Debt & loan tracker</li>
+      <li><div class="feat-icon">✓</div>Insurance manager</li>
+      <li><div class="feat-icon">✓</div>Multi-currency support</li>
+      <li><div class="feat-icon">✓</div>Monthly financial summary</li>
+    </ul>
+    <button class="sub-pay-btn" onclick="openPaymentModal()">Subscribe Now</button>
+    <div class="trial-note">Secure payment • No hidden charges</div>
+    <br>
+    <button class="skip-btn" onclick="activateTrial()">Continue with free trial (7 days left)</button>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="app-screen">
+  <div class="top-bar">
+    <h2 id="page-title">Dashboard</h2>
+    <div class="top-right">
+      <button class="currency-badge" onclick="openCurrencyModal()" id="curr-badge">₹ INR</button>
+      <div class="avatar" id="user-avatar">M</div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="greeting">
+      <h2>Hello, <span id="greet-name">User</span> 👋</h2>
+      <p id="greet-date"></p>
+    </div>
+    <div class="sub-status-bar" id="sub-status-bar">
+      <span id="sub-status-text">🆓 Free Trial — 7 days left</span>
+      <button class="sub-upgrade-btn" onclick="showSubScreen()">Upgrade ₹50/mo</button>
+    </div>
+    <div class="big-card">
+      <div class="label">Net Balance This Month</div>
+      <div class="big-amount" id="dash-balance">0</div>
+      <div class="currency-name" id="dash-currency-name">Indian Rupee (INR)</div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-card income"><div class="label">Income</div><div class="amount" id="dash-income">0</div></div>
+      <div class="summary-card expense"><div class="label">Expense</div><div class="amount" id="dash-expense">0</div></div>
+      <div class="summary-card debt"><div class="label">Total Debt</div><div class="amount" id="dash-debt">0</div></div>
+      <div class="summary-card balance"><div class="label">Savings Rate</div><div class="amount" id="dash-savings">0%</div></div>
+    </div>
+    <div class="section-title">Recent Transactions</div>
+    <div class="recent-list" id="dash-recent"></div>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <div class="page" id="page-transactions">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterTx('all',this)">All</button>
+      <button class="filter-btn" onclick="filterTx('income',this)">Income</button>
+      <button class="filter-btn" onclick="filterTx('expense',this)">Expense</button>
+    </div>
+    <div id="tx-list"></div>
+    <button class="fab" onclick="openTxModal()">+</button>
+  </div>
+
+  <!-- DEBTS -->
+  <div class="page" id="page-debts">
+    <div id="debt-list"></div>
+    <button class="fab" onclick="openDebtModal()">+</button>
+  </div>
+
+  <!-- INSURANCE -->
+  <div class="page" id="page-insurance">
+    <div id="ins-list"></div>
+    <button class="fab" onclick="openInsModal()">+</button>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span></button>
+    <button class="nav-item" onclick="showPage('transactions',this)"><span class="nav-icon">💸</span><span class="nav-label">Transactions</span></button>
+    <button class="nav-item" onclick="showPage('debts',this)"><span class="nav-icon">🏦</span><span class="nav-label">Debts</span></button>
+    <button class="nav-item" onclick="showPage('insurance',this)"><span class="nav-icon">🛡️</span><span class="nav-label">Insurance</span></button>
+  </nav>
+</div>
+
+<!-- TRANSACTION MODAL -->
+<div class="modal-overlay" id="tx-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Transaction</div>
+    <div class="tabs" style="margin-bottom:20px">
+      <button class="tab-btn active" onclick="setTxType('income',this)">Income</button>
+      <button class="tab-btn" onclick="setTxType('expense',this)">Expense</button>
+    </div>
+    <div class="form-group"><label>Description</label><input type="text" id="tx-desc" placeholder="e.g. Salary, Grocery, Rent"></div>
+    <div class="row2">
+      <div class="form-group"><label>Amount (<span class="curr-sym">₹</span>)</label><input type="number" id="tx-amount" placeholder="0"></div>
+      <div class="form-group"><label>Date</label><input type="date" id="tx-date"></div>
+    </div>
+    <div class="form-group"><label>Category</label><select id="tx-category"><option value="">Select category</option></select></div>
+    <div class="form-group"><label>Note (optional)</label><textarea id="tx-note" rows="2" placeholder="Any additional note..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('tx-modal')">Cancel</button>
+      <button class="btn-primary" style="padding:13px" onclick="saveTx()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEBT MODAL -->
+<div class="modal-overlay" id="debt-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Debt / Loan</div>
+    <div class="form-group"><label>Loan Name</label><input type="text" id="debt-name" placeholder="e.g. Home Loan"></div>
+    <div class="form-group"><label>Loan Type</label>
+      <select id="debt-type">
+        <option>Home Loan</option><option>Personal Loan</option><option>Car/Bike Loan</option>
+        <option>Gold Loan</option><option>Credit Card</option><option>Education Loan</option><option>Other</option>
+      </select>
+    </div>
+    <div class="row2">
+      <div class="form-group"><label>Total Amount</label><input type="number" id="debt-total" placeholder="500000"></div>
+      <div class="form-group"><label>Outstanding</label><input type="number" id="debt-outstanding" placeholder="350000"></div>
+    </div>
+    <div class="row2">
+      <div class="form-group"><label>EMI / Month</label><input type="number" id="debt-emi" placeholder="15000"></div>
+      <div class="form-group"><label>Interest Rate %</label><input type="number" id="debt-rate" placeholder="12.5"></div>
+    </div>
+    <div class="row2">
+      <div class="form-group"><label>Start Date</label><input type="date" id="debt-start"></div>
+      <div class="form-group"><label>End Date</label><input type="date" id="debt-end"></div>
+    </div>
+    <div class="form-group"><label>Lender / Bank</label><input type="text" id="debt-lender" placeholder="e.g. HDFC Bank"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('debt-modal')">Cancel</button>
+      <button class="btn-primary" style="padding:13px" onclick="saveDebt()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSURANCE MODAL -->
+<div class="modal-overlay" id="ins-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Insurance</div>
+    <div class="form-group"><label>Policy Name</label><input type="text" id="ins-name" placeholder="e.g. LIC Jeevan Anand"></div>
+    <div class="form-group"><label>Insurance Type</label>
+      <select id="ins-type">
+        <option>Life Insurance</option><option>Health Insurance</option><option>Vehicle Insurance</option>
+        <option>Term Insurance</option><option>Home Insurance</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Company</label><input type="text" id="ins-company" placeholder="e.g. LIC, HDFC Life"></div>
+    <div class="form-group"><label>Policy Number</label><input type="text" id="ins-policy-no" placeholder="Policy number"></div>
+    <div class="row2">
+      <div class="form-group"><label>Sum Assured</label><input type="number" id="ins-sum" placeholder="1000000"></div>
+      <div class="form-group"><label>Premium / Month</label><input type="number" id="ins-premium" placeholder="5000"></div>
+    </div>
+    <div class="row2">
+      <div class="form-group"><label>Start Date</label><input type="date" id="ins-start"></div>
+      <div class="form-group"><label>Renewal Date</label><input type="date" id="ins-renewal"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('ins-modal')">Cancel</button>
+      <button class="btn-primary" style="padding:13px" onclick="saveIns()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CURRENCY MODAL -->
+<div class="modal-overlay" id="currency-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Choose Your Currency</div>
+    <div class="form-group"><input type="text" id="currency-search" placeholder="Search country or currency..." oninput="filterCurrencies(this.value)"></div>
+    <div class="currency-grid" id="currency-grid"></div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn-cancel" onclick="closeModal('currency-modal')">Cancel</button>
+      <button class="btn-primary" style="padding:13px" onclick="saveCurrency()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Choose Payment Method</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Subscribe for <strong id="pay-price">₹50/month</strong> and unlock all features.</p>
+    <div class="payment-methods">
+      <div class="pay-method" onclick="simulatePay('UPI')">
+        <div class="pm-icon">📱</div>
+        <div class="pm-info"><div class="pm-name">UPI / GPay / PhonePe</div><div class="pm-desc">India — instant payment</div></div>
+      </div>
+      <div class="pay-method" onclick="simulatePay('Card')">
+        <div class="pm-icon">💳</div>
+        <div class="pm-info"><div class="pm-name">Credit / Debit Card</div><div class="pm-desc">Visa, Mastercard, Amex — worldwide</div></div>
+      </div>
+      <div class="pay-method" onclick="simulatePay('PayPal')">
+        <div class="pm-icon">🌐</div>
+        <div class="pm-info"><div class="pm-name">PayPal</div><div class="pm-desc">International — 130+ countries</div></div>
+      </div>
+      <div class="pay-method" onclick="simulatePay('NetBanking')">
+        <div class="pm-icon">🏦</div>
+        <div class="pm-info"><div class="pm-name">Net Banking</div><div class="pm-desc">All major banks supported</div></div>
+      </div>
+    </div>
+    <button class="btn-cancel" onclick="closeModal('payment-modal')" style="width:100%;padding:12px">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ---- CURRENCIES ----
+const CURRENCIES = [
+  {code:'INR',symbol:'₹',name:'Indian Rupee',country:'India',price:'₹50'},
+  {code:'USD',symbol:'$',name:'US Dollar',country:'USA',price:'$0.60'},
+  {code:'EUR',symbol:'€',name:'Euro',country:'Europe',price:'€0.55'},
+  {code:'GBP',symbol:'£',name:'British Pound',country:'UK',price:'£0.47'},
+  {code:'AED',symbol:'د.إ',name:'UAE Dirham',country:'UAE',price:'د.إ2.20'},
+  {code:'SAR',symbol:'﷼',name:'Saudi Riyal',country:'Saudi Arabia',price:'﷼2.25'},
+  {code:'SGD',symbol:'S$',name:'Singapore Dollar',country:'Singapore',price:'S$0.81'},
+  {code:'AUD',symbol:'A$',name:'Australian Dollar',country:'Australia',price:'A$0.92'},
+  {code:'CAD',symbol:'C$',name:'Canadian Dollar',country:'Canada',price:'C$0.82'},
+  {code:'JPY',symbol:'¥',name:'Japanese Yen',country:'Japan',price:'¥90'},
+  {code:'CNY',symbol:'¥',name:'Chinese Yuan',country:'China',price:'¥4.35'},
+  {code:'MYR',symbol:'RM',name:'Malaysian Ringgit',country:'Malaysia',price:'RM2.82'},
+  {code:'NZD',symbol:'NZ$',name:'New Zealand Dollar',country:'New Zealand',price:'NZ$1.00'},
+  {code:'ZAR',symbol:'R',name:'South African Rand',country:'South Africa',price:'R11.20'},
+  {code:'BDT',symbol:'৳',name:'Bangladeshi Taka',country:'Bangladesh',price:'৳65'},
+  {code:'NPR',symbol:'Rs',name:'Nepalese Rupee',country:'Nepal',price:'Rs80'},
+  {code:'PKR',symbol:'Rs',name:'Pakistani Rupee',country:'Pakistan',price:'Rs168'},
+  {code:'LKR',symbol:'₨',name:'Sri Lankan Rupee',country:'Sri Lanka',price:'₨183'},
+  {code:'THB',symbol:'฿',name:'Thai Baht',country:'Thailand',price:'฿22'},
+  {code:'IDR',symbol:'Rp',name:'Indonesian Rupiah',country:'Indonesia',price:'Rp9,500'},
+  {code:'PHP',symbol:'₱',name:'Philippine Peso',country:'Philippines',price:'₱35'},
+  {code:'KWD',symbol:'د.ك',name:'Kuwaiti Dinar',country:'Kuwait',price:'د.ك0.18'},
+  {code:'QAR',symbol:'﷼',name:'Qatari Riyal',country:'Qatar',price:'﷼2.19'},
+  {code:'BHD',symbol:'.د.ب',name:'Bahraini Dinar',country:'Bahrain',price:'.د.ب0.23'},
+  {code:'OMR',symbol:'﷼',name:'Omani Rial',country:'Oman',price:'﷼0.23'},
+  {code:'NGN',symbol:'₦',name:'Nigerian Naira',country:'Nigeria',price:'₦930'},
+  {code:'KES',symbol:'KSh',name:'Kenyan Shilling',country:'Kenya',price:'KSh78'},
+  {code:'GHS',symbol:'₵',name:'Ghanaian Cedi',country:'Ghana',price:'₵7.2'},
+  {code:'BRL',symbol:'R$',name:'Brazilian Real',country:'Brazil',price:'R$3.00'},
+  {code:'MXN',symbol:'$',name:'Mexican Peso',country:'Mexico',price:'$10.50'},
+  {code:'CHF',symbol:'CHF',name:'Swiss Franc',country:'Switzerland',price:'CHF0.54'},
+  {code:'SEK',symbol:'kr',name:'Swedish Krona',country:'Sweden',price:'kr6.30'},
+  {code:'NOK',symbol:'kr',name:'Norwegian Krone',country:'Norway',price:'kr6.40'},
+  {code:'DKK',symbol:'kr',name:'Danish Krone',country:'Denmark',price:'kr4.10'},
+  {code:'HKD',symbol:'HK$',name:'Hong Kong Dollar',country:'Hong Kong',price:'HK$4.69'},
+];
+
+let selectedCurrencyCode = 'INR';
+let tempCurrencyCode = 'INR';
+
+function getCurrency(code) { return CURRENCIES.find(c=>c.code===code) || CURRENCIES[0]; }
+function currSymbol() { return getCurrency(currentUser?.currency||'INR').symbol; }
+
+function fmt(n) {
+  if (!n||isNaN(n)) return '0';
+  const cur = getCurrency(currentUser?.currency||'INR');
+  const locale = cur.code==='INR'?'en-IN':'en-US';
+  return cur.symbol + Number(n).toLocaleString(locale,{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+
+// ---- STORAGE ----
+const store = {
+  get:(k)=>{ try{return JSON.parse(localStorage.getItem(k));}catch{return null;} },
+  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+};
+
+let currentUser = null;
+function getUsers(){return store.get('ft_users')||{};}
+function saveUsers(u){store.set('ft_users',u);}
+function getUserData(uid){return store.get('ft_data_'+uid)||{transactions:[],debts:[],insurance:[]};}
+function saveUserData(uid,d){store.set('ft_data_'+uid,d);}
+
+// ---- AUTH ----
+function switchAuthTab(tab,el){
+  document.querySelectorAll('.auth-box .tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
+  document.getElementById('register-form').style.display=tab==='register'?'block':'none';
+}
+
+function populateCurrencySelect(){
+  const sel=document.getElementById('reg-currency');
+  CURRENCIES.forEach(c=>{
+    const o=document.createElement('option');
+    o.value=c.code;
+    o.textContent=`${c.symbol} ${c.code} — ${c.country}`;
+    sel.appendChild(o);
+  });
+}
+
+function register(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass=document.getElementById('reg-pass').value;
+  const currency=document.getElementById('reg-currency').value||'INR';
+  const err=document.getElementById('reg-err');
+  if(!name||!email||!pass){err.className='error-msg err';err.textContent='Please fill all fields';return;}
+  if(pass.length<6){err.className='error-msg err';err.textContent='Password must be at least 6 characters';return;}
+  const users=getUsers();
+  if(users[email]){err.className='error-msg err';err.textContent='Account already exists';return;}
+  const uid='u_'+Date.now();
+  const trialEnd=Date.now()+(7*24*60*60*1000);
+  users[email]={uid,name,email,pass,currency,subscribed:false,trialEnd};
+  saveUsers(users);
+  err.className='error-msg ok';
+  err.textContent='Account created! Please login.';
+}
+
+function login(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pass=document.getElementById('login-pass').value;
+  const err=document.getElementById('login-err');
+  const users=getUsers();
+  if(!users[email]||users[email].pass!==pass){err.className='error-msg err';err.textContent='Invalid email or password';return;}
+  currentUser=users[email];
+  store.set('ft_session',email);
+  checkSubAndShow();
+}
+
+function checkSubAndShow(){
+  const now=Date.now();
+  if(currentUser.subscribed){showApp();return;}
+  if(currentUser.trialEnd&&now<currentUser.trialEnd){
+    const daysLeft=Math.ceil((currentUser.trialEnd-now)/(1000*60*60*24));
+    showApp();
+    document.getElementById('sub-status-text').textContent=`🆓 Free Trial — ${daysLeft} day${daysLeft!==1?'s':''} left`;
+    return;
+  }
+  showSubScreen();
+}
+
+function showSubScreen(){
+  const cur=getCurrency(currentUser.currency||'INR');
+  document.getElementById('sub-currency-show').textContent=`${cur.code} ${cur.symbol}`;
+  document.getElementById('sub-price-show').textContent=cur.price+'/mo';
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('sub-screen').style.display='flex';
+}
+
+function activateTrial(){
+  const users=getUsers();
+  users[currentUser.email].trialEnd=Date.now()+(7*24*60*60*1000);
+  currentUser=users[currentUser.email];
+  saveUsers(users);
+  document.getElementById('sub-screen').style.display='none';
+  showApp();
+}
+
+function openPaymentModal(){
+  const cur=getCurrency(currentUser.currency||'INR');
+  document.getElementById('pay-price').textContent=cur.price+'/month';
+  document.getElementById('payment-modal').classList.add('open');
+}
+
+function simulatePay(method){
+  closeModal('payment-modal');
+  const users=getUsers();
+  users[currentUser.email].subscribed=true;
+  currentUser=users[currentUser.email];
+  saveUsers(users);
+  document.getElementById('sub-screen').style.display='none';
+  showApp();
+  setTimeout(()=>alert('✅ Subscription activated via '+method+'!\n\nIn production, integrate Razorpay (India) or Stripe (International) here.'),300);
+}
+
+function logout(){
+  currentUser=null;
+  localStorage.removeItem('ft_session');
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('sub-screen').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+}
+
+// ---- CURRENCY MODAL ----
+let allCurrencies=[...CURRENCIES];
+function openCurrencyModal(){
+  tempCurrencyCode=currentUser.currency||'INR';
+  renderCurrencyGrid(CURRENCIES);
+  document.getElementById('currency-modal').classList.add('open');
+}
+function renderCurrencyGrid(list){
+  const g=document.getElementById('currency-grid');
+  g.innerHTML=list.map(c=>`
+    <div class="currency-option ${c.code===tempCurrencyCode?'selected':''}" onclick="selectCurrency('${c.code}')">
+      <div class="c-symbol">${c.symbol}</div>
+      <div class="c-code">${c.code}</div>
+      <div class="c-name">${c.country}</div>
+    </div>`).join('');
+}
+function selectCurrency(code){
+  tempCurrencyCode=code;
+  renderCurrencyGrid(CURRENCIES.filter(c=>document.getElementById('currency-search').value?c.name.toLowerCase().includes(document.getElementById('currency-search').value.toLowerCase())||c.country.toLowerCase().includes(document.getElementById('currency-search').value.toLowerCase())||c.code.toLowerCase().includes(document.getElementById('currency-search').value.toLowerCase()):true));
+}
+function filterCurrencies(q){
+  const filtered=q?CURRENCIES.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())||c.country.toLowerCase().includes(q.toLowerCase())||c.code.toLowerCase().includes(q.toLowerCase())):CURRENCIES;
+  renderCurrencyGrid(filtered);
+}
+function saveCurrency(){
+  const users=getUsers();
+  users[currentUser.email].currency=tempCurrencyCode;
+  currentUser=users[currentUser.email];
+  saveUsers(users);
+  closeModal('currency-modal');
+  const cur=getCurrency(tempCurrencyCode);
+  document.getElementById('curr-badge').textContent=cur.symbol+' '+cur.code;
+  document.querySelectorAll('.curr-sym').forEach(el=>el.textContent=cur.symbol);
+  renderDashboard();renderTransactions(currentFilter);renderDebts();renderInsurance();
+}
+
+// ---- APP ----
+function showApp(){
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('sub-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+  const cur=getCurrency(currentUser.currency||'INR');
+  document.getElementById('greet-name').textContent=currentUser.name.split(' ')[0];
+  document.getElementById('user-avatar').textContent=currentUser.name[0].toUpperCase();
+  document.getElementById('greet-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('curr-badge').textContent=cur.symbol+' '+cur.code;
+  document.getElementById('tx-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('debt-start').value=new Date().toISOString().split('T')[0];
+  document.getElementById('ins-start').value=new Date().toISOString().split('T')[0];
+  document.querySelectorAll('.curr-sym').forEach(el=>el.textContent=cur.symbol);
+  if(currentUser.subscribed){document.getElementById('sub-status-bar').style.display='none';}
+  renderDashboard();renderTransactions('all');renderDebts();renderInsurance();
+}
+
+// ---- NAV ----
+function showPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el)el.classList.add('active');
+  const titles={dashboard:'Dashboard',transactions:'Transactions',debts:'Debts & Loans',insurance:'Insurance'};
+  document.getElementById('page-title').textContent=titles[name];
+}
+
+function openTxModal(){setTxCategories('income');document.getElementById('tx-modal').classList.add('open');}
+function openDebtModal(){document.getElementById('debt-modal').classList.add('open');}
+function openInsModal(){document.getElementById('ins-modal').classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+let txType='income';
+function setTxType(type,el){
+  txType=type;
+  document.querySelectorAll('#tx-modal .tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  setTxCategories(type);
+}
+function setTxCategories(type){
+  const income=['Salary','Freelance','Business','Rental Income','Interest','Dividend','Gift','Other Income'];
+  const expense=['Food & Grocery','Rent','EMI','Utilities','Transport','Medical','Education','Shopping','Entertainment','Insurance Premium','Investment','Wedding/Function','Other'];
+  const sel=document.getElementById('tx-category');
+  sel.innerHTML='<option value="">Select category</option>';
+  (type==='income'?income:expense).forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+}
+
+// ---- TRANSACTIONS ----
+function saveTx(){
+  const desc=document.getElementById('tx-desc').value.trim();
+  const amount=parseFloat(document.getElementById('tx-amount').value);
+  const date=document.getElementById('tx-date').value;
+  const category=document.getElementById('tx-category').value;
+  const note=document.getElementById('tx-note').value.trim();
+  if(!desc||!amount||!date){alert('Please fill Description, Amount and Date');return;}
+  const data=getUserData(currentUser.uid);
+  data.transactions.unshift({id:Date.now(),type:txType,desc,amount,date,category,note});
+  saveUserData(currentUser.uid,data);
+  closeModal('tx-modal');
+  document.getElementById('tx-desc').value='';
+  document.getElementById('tx-amount').value='';
+  document.getElementById('tx-note').value='';
+  renderDashboard();renderTransactions(currentFilter);
+}
+
+let currentFilter='all';
+function filterTx(f,el){
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderTransactions(f);
+}
+function renderTransactions(filter){
+  const data=getUserData(currentUser.uid);
+  let txs=data.transactions;
+  if(filter==='income')txs=txs.filter(t=>t.type==='income');
+  if(filter==='expense')txs=txs.filter(t=>t.type==='expense');
+  const el=document.getElementById('tx-list');
+  if(!txs.length){el.innerHTML='<div class="empty-state"><div class="ei">💸</div><p>No transactions yet.<br>Tap + to add one.</p></div>';return;}
+  el.innerHTML=txs.map(t=>`
+    <div class="recent-list" style="margin-bottom:10px">
+      <div class="recent-item">
+        <div class="recent-icon ${t.type}-icon">${t.type==='income'?'⬆️':'⬇️'}</div>
+        <div class="recent-info">
+          <div class="ri-title">${t.desc}</div>
+          <div class="ri-date">${t.category||''} • ${fmtDate(t.date)}</div>
+          ${t.note?`<div class="ri-date" style="font-style:italic">${t.note}</div>`:''}
+        </div>
+        <div style="text-align:right">
+          <div class="recent-amount ${t.type==='income'?'income-amt':'expense-amt'}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div>
+          <button onclick="deleteTx(${t.id})" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;">✕ delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function deleteTx(id){
+  if(!confirm('Delete this transaction?'))return;
+  const data=getUserData(currentUser.uid);
+  data.transactions=data.transactions.filter(t=>t.id!==id);
+  saveUserData(currentUser.uid,data);
+  renderDashboard();renderTransactions(currentFilter);
+}
+
+// ---- DEBTS ----
+function saveDebt(){
+  const name=document.getElementById('debt-name').value.trim();
+  const type=document.getElementById('debt-type').value;
+  const total=parseFloat(document.getElementById('debt-total').value);
+  const outstanding=parseFloat(document.getElementById('debt-outstanding').value);
+  const emi=parseFloat(document.getElementById('debt-emi').value)||0;
+  const rate=parseFloat(document.getElementById('debt-rate').value)||0;
+  const start=document.getElementById('debt-start').value;
+  const end=document.getElementById('debt-end').value;
+  const lender=document.getElementById('debt-lender').value.trim();
+  if(!name||!total||!outstanding){alert('Please fill Name, Total and Outstanding');return;}
+  const data=getUserData(currentUser.uid);
+  data.debts.unshift({id:Date.now(),name,type,total,outstanding,emi,rate,start,end,lender});
+  saveUserData(currentUser.uid,data);
+  closeModal('debt-modal');
+  ['debt-name','debt-total','debt-outstanding','debt-emi','debt-rate','debt-lender'].forEach(id=>document.getElementById(id).value='');
+  renderDashboard();renderDebts();
+}
+function renderDebts(){
+  const data=getUserData(currentUser.uid);
+  const el=document.getElementById('debt-list');
+  if(!data.debts.length){el.innerHTML='<div class="empty-state"><div class="ei">🏦</div><p>No debts added.<br>Tap + to add a loan.</p></div>';return;}
+  el.innerHTML=data.debts.map(d=>{
+    const pct=Math.round(((d.total-d.outstanding)/d.total)*100);
+    return `<div class="debt-card">
+      <div class="debt-header">
+        <div><div class="debt-name">${d.name}</div>${d.lender?`<div style="font-size:12px;color:var(--muted);margin-top:2px">${d.lender}</div>`:''}</div>
+        <span class="debt-type-badge">${d.type}</span>
+      </div>
+      <div class="debt-detail">
+        <div><div class="dd-label">Outstanding</div><div class="dd-val">${fmt(d.outstanding)}</div></div>
+        <div><div class="dd-label">EMI/Month</div><div class="dd-val" style="color:var(--red)">${fmt(d.emi)}</div></div>
+        <div><div class="dd-label">Rate</div><div class="dd-val" style="color:var(--muted)">${d.rate}%</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">${pct}% paid • Ends ${d.end?fmtDate(d.end):'N/A'}</div>
+      <div class="debt-actions"><button class="btn-outline" onclick="deleteDebt(${d.id})">Delete</button></div>
+    </div>`;
+  }).join('');
+}
+function deleteDebt(id){
+  if(!confirm('Delete this loan?'))return;
+  const data=getUserData(currentUser.uid);
+  data.debts=data.debts.filter(d=>d.id!==id);
+  saveUserData(currentUser.uid,data);
+  renderDashboard();renderDebts();
+}
+
+// ---- INSURANCE ----
+function saveIns(){
+  const name=document.getElementById('ins-name').value.trim();
+  const type=document.getElementById('ins-type').value;
+  const company=document.getElementById('ins-company').value.trim();
+  const policyNo=document.getElementById('ins-policy-no').value.trim();
+  const sum=parseFloat(document.getElementById('ins-sum').value)||0;
+  const premium=parseFloat(document.getElementById('ins-premium').value)||0;
+  const start=document.getElementById('ins-start').value;
+  const renewal=document.getElementById('ins-renewal').value;
+  if(!name||!company){alert('Please fill Policy Name and Company');return;}
+  const data=getUserData(currentUser.uid);
+  data.insurance.unshift({id:Date.now(),name,type,company,policyNo,sum,premium,start,renewal});
+  saveUserData(currentUser.uid,data);
+  closeModal('ins-modal');
+  ['ins-name','ins-company','ins-policy-no','ins-sum','ins-premium'].forEach(id=>document.getElementById(id).value='');
+  renderInsurance();
+}
+function renderInsurance(){
+  const data=getUserData(currentUser.uid);
+  const el=document.getElementById('ins-list');
+  if(!data.insurance.length){el.innerHTML='<div class="empty-state"><div class="ei">🛡️</div><p>No insurance added.<br>Tap + to add a policy.</p></div>';return;}
+  el.innerHTML=data.insurance.map(ins=>`
+    <div class="ins-card">
+      <div class="ins-header">
+        <div><div class="ins-name">${ins.name}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${ins.company}</div></div>
+        <span class="ins-type-badge">${ins.type}</span>
+      </div>
+      <div class="ins-detail">
+        <div><div class="id-label">Policy No.</div><div class="id-val">${ins.policyNo||'N/A'}</div></div>
+        <div><div class="id-label">Sum Assured</div><div class="id-val">${fmt(ins.sum)}</div></div>
+        <div><div class="id-label">Premium/Month</div><div class="id-val" style="color:var(--warn)">${fmt(ins.premium)}</div></div>
+        <div><div class="id-label">Renewal</div><div class="id-val">${ins.renewal?fmtDate(ins.renewal):'N/A'}</div></div>
+      </div>
+      <div style="margin-top:12px"><button class="btn-outline" onclick="deleteIns(${ins.id})">Delete</button></div>
+    </div>`).join('');
+}
+function deleteIns(id){
+  if(!confirm('Delete this policy?'))return;
+  const data=getUserData(currentUser.uid);
+  data.insurance=data.insurance.filter(i=>i.id!==id);
+  saveUserData(currentUser.uid,data);
+  renderInsurance();
+}
+
+// ---- DASHBOARD ----
+function renderDashboard(){
+  const data=getUserData(currentUser.uid);
+  const now=new Date();
+  const monthTx=data.transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+  const income=monthTx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const expense=monthTx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const balance=income-expense;
+  const totalDebt=data.debts.reduce((s,d)=>s+d.outstanding,0);
+  const savingsRate=income>0?Math.round((balance/income)*100):0;
+  const cur=getCurrency(currentUser.currency||'INR');
+  document.getElementById('dash-balance').textContent=(balance>=0?'+':'')+fmt(balance);
+  document.getElementById('dash-balance').style.color=balance>=0?'#fff':'#fca5a5';
+  document.getElementById('dash-currency-name').textContent=cur.name+' ('+cur.code+')';
+  document.getElementById('dash-income').textContent=fmt(income);
+  document.getElementById('dash-expense').textContent=fmt(expense);
+  document.getElementById('dash-debt').textContent=fmt(totalDebt);
+  document.getElementById('dash-savings').textContent=savingsRate+'%';
+  const recent=data.transactions.slice(0,5);
+  const rEl=document.getElementById('dash-recent');
+  if(!recent.length){rEl.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No transactions yet</div>';return;}
+  rEl.innerHTML=recent.map(t=>`
+    <div class="recent-item">
+      <div class="recent-icon ${t.type}-icon">${t.type==='income'?'⬆️':'⬇️'}</div>
+      <div class="recent-info"><div class="ri-title">${t.desc}</div><div class="ri-date">${t.category||''} • ${fmtDate(t.date)}</div></div>
+      <div class="recent-amount ${t.type==='income'?'income-amt':'expense-amt'}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div>
+    </div>`).join('');
+}
+
+// ---- UTILS ----
+function fmtDate(d){if(!d)return'';return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+
+// ---- INIT ----
+window.addEventListener('DOMContentLoaded',()=>{
+  populateCurrencySelect();
+  const session=store.get('ft_session');
+  if(session){const users=getUsers();if(users[session]){currentUser=users[session];checkSubAndShow();return;}}
+  document.getElementById('auth-screen').style.display='flex';
+});
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
+</script>
+</body>
+</html>
