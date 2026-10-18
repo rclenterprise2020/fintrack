@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4f46e5">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>FinTrack — Personal Finance</title>
@@ -952,6 +954,13 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('auth-screen').style.display='flex';
 });
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
+  if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/fintrack/sw.js')
+    .then(r=>console.log('SW ready'))
+    .catch(e=>console.log('SW error',e));
+  });
+}
 </script>
 </body>
 </html>
