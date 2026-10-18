@@ -168,8 +168,6 @@ h1,h2,h3{font-family:'Sora',sans-serif;}
 .pay-method .pm-info .pm-desc{font-size:12px;color:var(--muted);}
 .pay-confirm{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:12px;padding:14px;width:100%;font-size:15px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 4px 15px rgba(79,70,229,0.35);}
 </style>
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4f46e5">
 </head>
 <body>
 
@@ -185,14 +183,49 @@ h1,h2,h3{font-family:'Sora',sans-serif;}
       <button class="tab-btn" onclick="switchAuthTab('register',this)">Register</button>
     </div>
     <div id="login-form">
-      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="you@email.com"></div>
+      <div class="form-group"><label>Email or Mobile Number</label><input type="text" id="login-email" placeholder="you@email.com or 9876543210"></div>
       <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
       <button class="btn-primary" onclick="login()">Login</button>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="showForgotPassword()" style="background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;text-decoration:underline;font-family:'Inter',sans-serif;">Forgot Password?</button>
+      </div>
       <div class="error-msg" id="login-err"></div>
     </div>
     <div id="register-form" style="display:none">
       <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your full name"></div>
       <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="you@email.com"></div>
+      <div class="form-group"><label>Mobile Number</label>
+        <div style="display:flex;gap:8px">
+          <select id="reg-country-code" style="width:110px;padding:11px 8px;background:#f8f9ff;border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none;font-family:'Inter',sans-serif;">
+            <option value="+91">🇮🇳 +91</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+44">🇬🇧 +44</option>
+            <option value="+971">🇦🇪 +971</option>
+            <option value="+966">🇸🇦 +966</option>
+            <option value="+65">🇸🇬 +65</option>
+            <option value="+61">🇦🇺 +61</option>
+            <option value="+1-CA">🇨🇦 +1</option>
+            <option value="+81">🇯🇵 +81</option>
+            <option value="+60">🇲🇾 +60</option>
+            <option value="+64">🇳🇿 +64</option>
+            <option value="+27">🇿🇦 +27</option>
+            <option value="+880">🇧🇩 +880</option>
+            <option value="+977">🇳🇵 +977</option>
+            <option value="+92">🇵🇰 +92</option>
+            <option value="+94">🇱🇰 +94</option>
+            <option value="+66">🇹🇭 +66</option>
+            <option value="+62">🇮🇩 +62</option>
+            <option value="+63">🇵🇭 +63</option>
+            <option value="+55">🇧🇷 +55</option>
+            <option value="+49">🇩🇪 +49</option>
+            <option value="+33">🇫🇷 +33</option>
+            <option value="+86">🇨🇳 +86</option>
+            <option value="+234">🇳🇬 +234</option>
+            <option value="+254">🇰🇪 +254</option>
+          </select>
+          <input type="tel" id="reg-mobile" placeholder="Mobile number" style="flex:1;padding:11px 14px;background:#f8f9ff;border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;">
+        </div>
+      </div>
       <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Min 6 characters"></div>
       <div class="form-group">
         <label>Your Country Currency</label>
@@ -202,6 +235,22 @@ h1,h2,h3{font-family:'Sora',sans-serif;}
       </div>
       <button class="btn-primary" onclick="register()">Create Free Account</button>
       <div class="error-msg" id="reg-err"></div>
+    </div>
+    <!-- FORGOT PASSWORD FORM -->
+    <div id="forgot-form" style="display:none">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:36px">🔐</div>
+        <h3 style="font-size:18px;color:var(--text);margin-top:8px">Reset Password</h3>
+        <p style="font-size:13px;color:var(--muted);margin-top:4px">Enter your email or mobile to reset</p>
+      </div>
+      <div class="form-group"><label>Email or Mobile Number</label><input type="text" id="forgot-input" placeholder="you@email.com or 9876543210"></div>
+      <div class="form-group"><label>New Password</label><input type="password" id="forgot-newpass" placeholder="Min 6 characters"></div>
+      <div class="form-group"><label>Confirm New Password</label><input type="password" id="forgot-confirmpass" placeholder="Repeat new password"></div>
+      <button class="btn-primary" onclick="resetPassword()">Reset Password</button>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="backToLogin()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;">← Back to Login</button>
+      </div>
+      <div class="error-msg" id="forgot-err"></div>
     </div>
   </div>
 </div>
@@ -495,6 +544,34 @@ function switchAuthTab(tab,el){
   el.classList.add('active');
   document.getElementById('login-form').style.display=tab==='login'?'block':'none';
   document.getElementById('register-form').style.display=tab==='register'?'block':'none';
+  document.getElementById('forgot-form').style.display='none';
+}
+function showForgotPassword(){
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('forgot-form').style.display='block';
+  document.getElementById('login-err').textContent='';
+}
+function backToLogin(){
+  document.getElementById('forgot-form').style.display='none';
+  document.getElementById('login-form').style.display='block';
+  document.getElementById('forgot-err').textContent='';
+}
+function resetPassword(){
+  const input=document.getElementById('forgot-input').value.trim().toLowerCase();
+  const newpass=document.getElementById('forgot-newpass').value;
+  const confirmpass=document.getElementById('forgot-confirmpass').value;
+  const err=document.getElementById('forgot-err');
+  if(!input){err.className='error-msg err';err.textContent='Please enter your email or mobile number';return;}
+  if(!newpass||newpass.length<6){err.className='error-msg err';err.textContent='Password must be at least 6 characters';return;}
+  if(newpass!==confirmpass){err.className='error-msg err';err.textContent='Passwords do not match';return;}
+  const users=getUsers();
+  // find by email or mobile
+  const found=Object.values(users).find(u=>u.email===input||u.mobile===input||u.mobile===input.replace(/\D/g,''));
+  if(!found){err.className='error-msg err';err.textContent='No account found with this email or mobile';return;}
+  users[found.email].pass=newpass;
+  saveUsers(users);
+  err.className='error-msg ok';err.textContent='✅ Password reset successful! Please login.';
+  setTimeout(()=>{backToLogin();document.getElementById('forgot-err').textContent='';},2000);
 }
 
 function populateCurrencySelect(){
@@ -510,29 +587,39 @@ function populateCurrencySelect(){
 function register(){
   const name=document.getElementById('reg-name').value.trim();
   const email=document.getElementById('reg-email').value.trim().toLowerCase();
+  const countryCode=document.getElementById('reg-country-code').value;
+  const mobileRaw=document.getElementById('reg-mobile').value.trim().replace(/\D/g,'');
+  const mobile=mobileRaw?countryCode.replace('-CA','')+mobileRaw:'';
   const pass=document.getElementById('reg-pass').value;
   const currency=document.getElementById('reg-currency').value||'INR';
   const err=document.getElementById('reg-err');
-  if(!name||!email||!pass){err.className='error-msg err';err.textContent='Please fill all fields';return;}
+  if(!name||!email||!pass){err.className='error-msg err';err.textContent='Please fill Name, Email and Password';return;}
   if(pass.length<6){err.className='error-msg err';err.textContent='Password must be at least 6 characters';return;}
   const users=getUsers();
-  if(users[email]){err.className='error-msg err';err.textContent='Account already exists';return;}
+  if(users[email]){err.className='error-msg err';err.textContent='Account already exists with this email';return;}
+  if(mobile&&Object.values(users).find(u=>u.mobile===mobile)){err.className='error-msg err';err.textContent='Account already exists with this mobile number';return;}
   const uid='u_'+Date.now();
   const trialEnd=Date.now()+(7*24*60*60*1000);
-  users[email]={uid,name,email,pass,currency,subscribed:false,trialEnd};
+  users[email]={uid,name,email,mobile,pass,currency,subscribed:false,trialEnd};
   saveUsers(users);
   err.className='error-msg ok';
-  err.textContent='Account created! Please login.';
+  err.textContent='✅ Account created! Please login.';
 }
 
 function login(){
-  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const input=document.getElementById('login-email').value.trim().toLowerCase();
   const pass=document.getElementById('login-pass').value;
   const err=document.getElementById('login-err');
   const users=getUsers();
-  if(!users[email]||users[email].pass!==pass){err.className='error-msg err';err.textContent='Invalid email or password';return;}
-  currentUser=users[email];
-  store.set('ft_session',email);
+  // find by email or mobile
+  let user=users[input];
+  if(!user){
+    const mobileClean=input.replace(/\D/g,'');
+    user=Object.values(users).find(u=>u.mobile&&(u.mobile===input||u.mobile.replace(/\D/g,'')===mobileClean||u.mobile.endsWith(mobileClean)));
+  }
+  if(!user||user.pass!==pass){err.className='error-msg err';err.textContent='Invalid email/mobile or password';return;}
+  currentUser=user;
+  store.set('ft_session',user.email);
   checkSubAndShow();
 }
 
