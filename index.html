@@ -954,7 +954,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('auth-screen').style.display='flex';
 });
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
-  if('serviceWorker' in navigator){
+  });
+if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('/fintrack/sw.js')
     .then(r=>console.log('SW ready'))
